@@ -18,7 +18,7 @@ Current version: `0.1.0`
 ## Requirements
 
 - macOS 14 or newer.
-- Swift 6.2 or newer for local builds.
+- Swift 6.1 or newer for local builds.
 - Accessibility permission for automatic paste.
 
 ## Install From DMG
