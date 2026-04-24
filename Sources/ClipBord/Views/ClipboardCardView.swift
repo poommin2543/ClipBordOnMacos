@@ -56,7 +56,7 @@ struct ClipboardCardView: View {
             }
             .buttonStyle(.plain)
 
-            VStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Menu {
                     Button(item.isPinned ? "Unpin" : "Pin", action: onTogglePin)
                     Button("Delete", role: .destructive, action: onDelete)
@@ -75,8 +75,6 @@ struct ClipboardCardView: View {
                         )
                 }
                 .menuStyle(.borderlessButton)
-
-                Spacer(minLength: 4)
 
                 actionButton(
                     systemImage: item.isPinned ? "pin.fill" : "pin",

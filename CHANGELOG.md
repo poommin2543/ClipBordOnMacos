@@ -2,6 +2,10 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.5 - 2026-04-24
+
+- Moved the pin control next to the `…` menu on the top-right of each clipboard card so actions read as one toolbar instead of a floating pin at the bottom.
+
 ## 0.1.4 - 2026-04-24
 
 - Run the GitHub release check once when the app finishes launching (`ClipBordAppController`), in addition to when the menu bar panel opens; prevent overlapping checks with an in-flight flag.
