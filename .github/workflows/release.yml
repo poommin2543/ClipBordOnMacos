@@ -16,9 +16,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Resolve version from tag
-        id: ver
+      - name: Resolve release metadata
+        id: meta
         shell: bash
         run: |
           tag="${GITHUB_REF_NAME}"
@@ -27,7 +29,6 @@ jobs:
             exit 1
           fi
           version="${tag#v}"
-          echo "version=${version}" >> "${GITHUB_OUTPUT}"
           if [[ "${version}" == *-* ]]; then
             echo "prerelease=true" >> "${GITHUB_OUTPUT}"
           else
@@ -35,13 +36,24 @@ jobs:
           fi
 
       - name: Package release DMG
-        env:
-          CLIPBORD_VERSION: ${{ steps.ver.outputs.version }}
         run: ./script/package_dmg.sh
+
+      - name: Locate DMG
+        id: dmg
+        shell: bash
+        run: |
+          shopt -s nullglob
+          paths=(dist/ClipBord\ *.dmg)
+          if [[ "${#paths[@]}" -ne 1 ]]; then
+            echo "Expected exactly one dist/ClipBord *.dmg, got: ${paths[*]-none}" >&2
+            ls -la dist || true
+            exit 1
+          fi
+          echo "file=${paths[0]}" >> "${GITHUB_OUTPUT}"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: "dist/ClipBord ${{ steps.ver.outputs.version }}.dmg"
-          prerelease: ${{ steps.ver.outputs.prerelease == 'true' }}
+          files: ${{ steps.dmg.outputs.file }}
+          prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
           generate_release_notes: true

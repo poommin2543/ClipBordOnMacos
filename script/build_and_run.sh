@@ -3,12 +3,12 @@ set -euo pipefail
 
 MODE="${1:-run}"
 APP_NAME="ClipBord"
-APP_VERSION="${CLIPBORD_VERSION:-0.1.0}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CLIPBORD_VERSION="${CLIPBORD_VERSION:-$("$ROOT_DIR/script/clipbord_version.sh")}"
+APP_VERSION="$CLIPBORD_VERSION"
 CLIPBORD_SWIFT_CONFIGURATION="${CLIPBORD_SWIFT_CONFIGURATION:-debug}"
 BUNDLE_ID="com.sittinonthanonklang.ClipBord"
 MIN_SYSTEM_VERSION="14.0"
-
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"

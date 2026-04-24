@@ -13,14 +13,14 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Build release DMG
-        env:
-          CLIPBORD_VERSION: "0.1.0"
         run: ./script/package_dmg.sh
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ClipBord-0.1.0-dmg
-          path: dist/ClipBord 0.1.0.dmg
+          name: ClipBord-dmg
+          path: dist/ClipBord *.dmg

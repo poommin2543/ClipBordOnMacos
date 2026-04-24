@@ -95,10 +95,19 @@ struct ClipboardPanelView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Text("Clipboard")
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
-                    .foregroundStyle(palette.primaryText)
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("ClipBord")
+                        .font(.system(size: 22, weight: .semibold, design: .rounded))
+                        .foregroundStyle(palette.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+
+                    Text(AppVersion.displayLabel)
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundStyle(palette.secondaryText.opacity(0.9))
+                }
+                .layoutPriority(1)
 
                 Spacer(minLength: 0)
 
