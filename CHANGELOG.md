@@ -2,6 +2,11 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.7 - 2026-04-24
+
+- Card actions: separate pin and delete controls using themed SF Symbols (`ClipBordPalette`) instead of emoji.
+- Header: vertically center the theme menu with Clear all / power; hide the menu chevron so alignment matches other controls.
+
 ## 0.1.6 - 2026-04-24
 
 - Check for a newer GitHub release on **every app launch** (no throttle); panel open still uses the 3-hour throttle.

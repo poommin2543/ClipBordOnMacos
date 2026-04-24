@@ -99,7 +99,7 @@ struct ClipboardPanelView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("ClipBord")
                         .font(.system(size: 22, weight: .semibold, design: .rounded))
@@ -267,6 +267,7 @@ struct ClipboardPanelView: View {
                 )
         }
         .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
     }
 
     private var themeIconName: String {

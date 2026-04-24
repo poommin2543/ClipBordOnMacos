@@ -57,30 +57,41 @@ struct ClipboardCardView: View {
             .buttonStyle(.plain)
 
             HStack(spacing: 6) {
-                Menu {
-                    Button(item.isPinned ? "Unpin" : "Pin", action: onTogglePin)
-                    Button("Delete", role: .destructive, action: onDelete)
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(palette.secondaryText)
-                        .frame(width: 26, height: 26)
+                Button(action: onTogglePin) {
+                    Image(systemName: item.isPinned ? "pin.fill" : "pin")
+                        .font(.system(size: 13, weight: .semibold))
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundStyle(item.isPinned ? Color.accentColor : palette.secondaryText)
+                        .frame(width: 28, height: 28)
+                        .background(
+                            Rectangle()
+                                .fill(item.isPinned ? palette.accentFill : palette.subtleFill)
+                        )
+                        .overlay(
+                            Rectangle()
+                                .stroke(item.isPinned ? palette.accentStroke : palette.separator, lineWidth: item.isPinned ? 1.5 : 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(item.isPinned ? "Unpin" : "Pin")
+
+                Button(role: .destructive, action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 13, weight: .semibold))
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundStyle(palette.warning.opacity(colorScheme == .dark ? 0.92 : 0.88))
+                        .frame(width: 28, height: 28)
                         .background(
                             Rectangle()
                                 .fill(palette.subtleFill)
                         )
                         .overlay(
                             Rectangle()
-                                .stroke(palette.separator, lineWidth: 1)
+                                .stroke(palette.warning.opacity(colorScheme == .dark ? 0.42 : 0.35), lineWidth: 1)
                         )
                 }
-                .menuStyle(.borderlessButton)
-
-                actionButton(
-                    systemImage: item.isPinned ? "pin.fill" : "pin",
-                    tint: item.isPinned ? Color.accentColor : palette.secondaryText,
-                    action: onTogglePin
-                )
+                .buttonStyle(.plain)
+                .accessibilityLabel("Delete")
             }
             .opacity(isHovered ? 1 : 0.88)
         }
@@ -184,21 +195,4 @@ struct ClipboardCardView: View {
         )
     }
 
-    private func actionButton(systemImage: String, tint: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(tint)
-                .frame(width: 26, height: 26)
-                .background(
-                    Rectangle()
-                        .fill(palette.subtleFill)
-                )
-                .overlay(
-                    Rectangle()
-                        .stroke(palette.separator, lineWidth: 1)
-                )
-        }
-        .buttonStyle(.plain)
-    }
 }
