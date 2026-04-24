@@ -3,7 +3,8 @@ set -euo pipefail
 
 MODE="${1:-run}"
 APP_NAME="ClipBord"
-APP_VERSION="0.1.0"
+APP_VERSION="${CLIPBORD_VERSION:-0.1.0}"
+CLIPBORD_SWIFT_CONFIGURATION="${CLIPBORD_SWIFT_CONFIGURATION:-debug}"
 BUNDLE_ID="com.sittinonthanonklang.ClipBord"
 MIN_SYSTEM_VERSION="14.0"
 
@@ -53,8 +54,8 @@ pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 "$ROOT_DIR/script/make_app_icon.sh" >/dev/null
 
-swift build
-BUILD_BINARY="$(swift build --show-bin-path)/$APP_NAME"
+swift build -c "$CLIPBORD_SWIFT_CONFIGURATION"
+BUILD_BINARY="$(swift build -c "$CLIPBORD_SWIFT_CONFIGURATION" --show-bin-path)/$APP_NAME"
 
 mkdir -p "$APP_MACOS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"

@@ -2,7 +2,8 @@
 set -euo pipefail
 
 APP_NAME="ClipBord"
-APP_VERSION="0.1.0"
+APP_VERSION="${CLIPBORD_VERSION:-0.1.0}"
+CLIPBORD_SWIFT_CONFIGURATION="${CLIPBORD_SWIFT_CONFIGURATION:-release}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
@@ -44,7 +45,10 @@ verify_bundle() {
   /usr/bin/codesign --verify --deep --strict --verbose=2 "$bundle_path"
 }
 
-CLIPBORD_SKIP_SIGNING=1 "$ROOT_DIR/script/build_and_run.sh" --build-only
+CLIPBORD_SKIP_SIGNING=1 \
+CLIPBORD_VERSION="$APP_VERSION" \
+CLIPBORD_SWIFT_CONFIGURATION="$CLIPBORD_SWIFT_CONFIGURATION" \
+"$ROOT_DIR/script/build_and_run.sh" --build-only
 clear_bundle_xattrs "$APP_BUNDLE"
 
 mkdir -p "$STAGING_DIR"

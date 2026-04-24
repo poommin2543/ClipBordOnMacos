@@ -14,10 +14,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Build
-        run: swift build
-
-      - name: Package DMG
+      - name: Build release DMG
+        env:
+          CLIPBORD_VERSION: "0.1.0"
         run: ./script/package_dmg.sh
 
       - name: Upload DMG artifact
