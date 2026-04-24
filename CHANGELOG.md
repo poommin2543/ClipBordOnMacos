@@ -2,6 +2,10 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.9 - 2026-04-24
+
+- Swift 6 / Xcode 16: mark `MenuBarExtraIcon` `@MainActor` so the cached `NSImage` satisfies concurrency checks in release (`package_dmg.sh`) builds.
+
 ## 0.1.8 - 2026-04-24
 
 - Menu bar icon: render `square.on.square` via `NSImage.SymbolConfiguration` (`.ultraLight`) so the status item actually shows a thin stroke; SwiftUI-only modifiers on `MenuBarExtra` labels are often ignored.

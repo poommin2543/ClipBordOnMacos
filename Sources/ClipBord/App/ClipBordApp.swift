@@ -3,6 +3,7 @@ import SwiftUI
 
 /// `MenuBarExtra` บน macOS มักไม่นำ `.font` / `.symbolRenderingMode` ของ SwiftUI ไปใช้กับไอคอนแถบเมนู
 /// จึงสร้างสัญลักษณ์ผ่าน `NSImage.SymbolConfiguration` ให้ได้น้ำหนักเส้นที่ตั้งใจ
+@MainActor
 private enum MenuBarExtraIcon {
     static let image: NSImage = {
         let base = NSImage(
