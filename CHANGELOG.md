@@ -2,6 +2,12 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.10 - 2026-04-24
+
+- In-app update: after the DMG download completes, ClipBord quits and installs **without a second confirmation dialog** (one explicit “Download & install” / “Update now” is enough).
+- Installer replaces **`ClipBord.app/Contents`** in place instead of deleting the entire `.app` first, which helps macOS keep Accessibility / TCC decisions when the install path, bundle ID, and signing identity stay consistent (Developer ID builds).
+- Panel control label **Update now** (was “Install & relaunch”).
+
 ## 0.1.9 - 2026-04-24
 
 - Swift 6 / Xcode 16: mark `MenuBarExtraIcon` `@MainActor` so the cached `NSImage` satisfies concurrency checks in release (`package_dmg.sh`) builds.

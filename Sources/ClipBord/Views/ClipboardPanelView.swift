@@ -204,7 +204,7 @@ struct ClipboardPanelView: View {
                     .minimumScaleFactor(0.85)
                 Spacer(minLength: 0)
                 if ClipBordReleaseInstaller.isRunningFromAppBundle {
-                    Button("Install & relaunch") {
+                    Button("Update now") {
                         updateChecker.beginInstallUpdate()
                     }
                     .buttonStyle(.plain)

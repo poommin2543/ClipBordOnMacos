@@ -18,12 +18,15 @@ enum ClipBordReleaseInstaller {
         let dmgQ = shellSingleQuoted(dmgPath)
         let targetQ = shellSingleQuoted(targetPath)
 
+        // Replace `Contents` in place instead of deleting the whole `.app`. Same install path and bundle
+        // folder are more likely to keep Accessibility / TCC entries when the signing team and bundle ID
+        // stay the same (Developer ID builds); ad‑hoc or moved installs may still re‑prompt.
         let lines = [
             "#!/bin/bash",
             "set -euo pipefail",
             "DMG=\(dmgQ)",
             "TARGET=\(targetQ)",
-            "sleep 2",
+            "sleep 0.8",
             "MOUNT=\"$(/usr/bin/mktemp -d /tmp/clipbord-upd.XXXXXX)\"",
             "/usr/bin/hdiutil attach \"$DMG\" -mountpoint \"$MOUNT\" -nobrowse -quiet",
             "if [[ ! -d \"$MOUNT/ClipBord.app\" ]]; then",
@@ -31,8 +34,13 @@ enum ClipBordReleaseInstaller {
             "  /bin/rm -rf \"$MOUNT\"",
             "  exit 1",
             "fi",
-            "/bin/rm -rf \"$TARGET\"",
-            "/usr/bin/ditto \"$MOUNT/ClipBord.app\" \"$TARGET\"",
+            "if [[ -d \"$TARGET/Contents\" ]]; then",
+            "  /bin/rm -rf \"$TARGET/Contents\"",
+            "  /usr/bin/ditto \"$MOUNT/ClipBord.app/Contents\" \"$TARGET/Contents\"",
+            "else",
+            "  /bin/rm -rf \"$TARGET\"",
+            "  /usr/bin/ditto \"$MOUNT/ClipBord.app\" \"$TARGET\"",
+            "fi",
             "/usr/bin/xattr -dr com.apple.quarantine \"$TARGET\" 2>/dev/null || true",
             "/usr/bin/hdiutil detach \"$MOUNT\" -force -quiet || true",
             "/bin/rm -rf \"$MOUNT\"",

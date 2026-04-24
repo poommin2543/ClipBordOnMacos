@@ -104,7 +104,7 @@ final class GitHubUpdateChecker: ObservableObject {
             try FileManager.default.moveItem(at: tmpFile, to: dest)
 
             await MainActor.run {
-                self.presentInstallConfirmation(localDmgURL: dest)
+                self.installFromDownloadedDMG(localDmgURL: dest)
             }
         } catch {
             await MainActor.run {
@@ -121,35 +121,21 @@ final class GitHubUpdateChecker: ObservableObject {
         }
     }
 
-    private func presentInstallConfirmation(localDmgURL: URL) {
-        let label = pendingVersionLabel ?? "update"
-
+    /// One-step install after download: schedule the shell installer, then quit immediately so the update can run.
+    private func installFromDownloadedDMG(localDmgURL: URL) {
         NSApp.activate(ignoringOtherApps: true)
 
-        let alert = NSAlert()
-        alert.messageText = "Install ClipBord \(label)?"
-        alert.informativeText = "ClipBord will quit, replace the app where it is installed, then reopen automatically. Your clipboard history is kept on disk."
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: "Install & Relaunch")
-        alert.addButton(withTitle: "Cancel")
-
-        let choice = alert.runModal()
-        if choice == .alertFirstButtonReturn {
-            do {
-                try ClipBordReleaseInstaller.installAfterQuit(
-                    dmgURL: localDmgURL,
-                    targetAppBundle: Bundle.main.bundleURL
-                )
-                NSApplication.shared.terminate(nil)
-            } catch {
-                NSApp.activate(ignoringOtherApps: true)
-                let errorAlert = NSAlert()
-                errorAlert.messageText = "Could not install update"
-                errorAlert.informativeText = error.localizedDescription
-                errorAlert.runModal()
-                restorePendingUpdateAfterDownloadFailure()
-            }
-        } else {
+        do {
+            try ClipBordReleaseInstaller.installAfterQuit(
+                dmgURL: localDmgURL,
+                targetAppBundle: Bundle.main.bundleURL
+            )
+            NSApplication.shared.terminate(nil)
+        } catch {
+            let errorAlert = NSAlert()
+            errorAlert.messageText = "Could not install update"
+            errorAlert.informativeText = error.localizedDescription
+            errorAlert.runModal()
             try? FileManager.default.removeItem(at: localDmgURL)
             restorePendingUpdateAfterDownloadFailure()
         }

@@ -72,7 +72,7 @@ final class ClipBordAppController: ObservableObject {
             let alert = NSAlert()
             alert.messageText = "Update available"
             alert.informativeText =
-                "ClipBord \(versionLabel) is ready. Download & install replaces this app in place and relaunches it. If you use a Developer ID–signed build at the same path, macOS usually keeps Accessibility; ad‑hoc signed builds may need to be allowed again."
+                "ClipBord \(versionLabel) is ready. ClipBord will download the update, quit, replace the app in place, and reopen automatically. Clipboard history stays on disk. Accessibility is most likely preserved with a Developer ID build at the same install path; ad‑hoc or moved copies may need to be allowed again in System Settings."
             alert.alertStyle = .informational
             alert.addButton(withTitle: "Download & install")
             alert.addButton(withTitle: "Not now")
