@@ -1,4 +1,20 @@
+import AppKit
 import SwiftUI
+
+/// `MenuBarExtra` บน macOS มักไม่นำ `.font` / `.symbolRenderingMode` ของ SwiftUI ไปใช้กับไอคอนแถบเมนู
+/// จึงสร้างสัญลักษณ์ผ่าน `NSImage.SymbolConfiguration` ให้ได้น้ำหนักเส้นที่ตั้งใจ
+private enum MenuBarExtraIcon {
+    static let image: NSImage = {
+        let base = NSImage(
+            systemSymbolName: "square.on.square",
+            accessibilityDescription: "ClipBord"
+        )!
+        let config = NSImage.SymbolConfiguration(pointSize: 15, weight: .ultraLight)
+        let resolved = base.withSymbolConfiguration(config) ?? base
+        resolved.isTemplate = true
+        return resolved
+    }()
+}
 
 @main
 struct ClipBordApp: App {
@@ -9,7 +25,7 @@ struct ClipBordApp: App {
     }
 
     var body: some Scene {
-        MenuBarExtra("ClipBord", systemImage: "square.on.square") {
+        MenuBarExtra {
             ClipboardPanelView(
                 store: appController.store,
                 hotKeySettings: appController.hotKeySettings,
@@ -22,6 +38,9 @@ struct ClipBordApp: App {
                 onQuit: { appController.quit() }
             )
             .id(appController.themeSettings.theme)
+        } label: {
+            Image(nsImage: MenuBarExtraIcon.image)
+                .accessibilityLabel("ClipBord")
         }
         .menuBarExtraStyle(.window)
     }

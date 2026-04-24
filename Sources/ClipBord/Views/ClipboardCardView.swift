@@ -31,7 +31,7 @@ struct ClipboardCardView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 8) {
                                 if item.isPinned {
-                                    chip(title: "Pinned", systemImage: "pin.fill")
+                                    chip(title: "Pinned", systemImage: "pin")
                                 }
 
                                 if let imageDimensionsLabel = item.imageDimensionsLabel {
@@ -58,8 +58,8 @@ struct ClipboardCardView: View {
 
             HStack(spacing: 6) {
                 Button(action: onTogglePin) {
-                    Image(systemName: item.isPinned ? "pin.fill" : "pin")
-                        .font(.system(size: 13, weight: .semibold))
+                    Image(systemName: "pin")
+                        .font(.system(size: 13, weight: .light))
                         .symbolRenderingMode(.monochrome)
                         .foregroundStyle(item.isPinned ? Color.accentColor : palette.secondaryText)
                         .frame(width: 28, height: 28)
@@ -77,7 +77,7 @@ struct ClipboardCardView: View {
 
                 Button(role: .destructive, action: onDelete) {
                     Image(systemName: "trash")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 13, weight: .light))
                         .symbolRenderingMode(.monochrome)
                         .foregroundStyle(palette.warning.opacity(colorScheme == .dark ? 0.92 : 0.88))
                         .frame(width: 28, height: 28)
@@ -122,8 +122,9 @@ struct ClipboardCardView: View {
                             .stroke(palette.separator, lineWidth: 1)
                     )
 
-                Image(systemName: "doc.text")
-                    .font(.system(size: 18, weight: .semibold))
+                Image(systemName: "doc")
+                    .font(.system(size: 20, weight: .light))
+                    .symbolRenderingMode(.monochrome)
                     .foregroundStyle(Color.accentColor)
             }
             .frame(width: 48, height: 48)
@@ -152,8 +153,9 @@ struct ClipboardCardView: View {
                                     .stroke(palette.separator, lineWidth: 1)
                             )
 
-                        Image(systemName: "photo.fill")
-                            .font(.system(size: 18, weight: .semibold))
+                        Image(systemName: "photo")
+                            .font(.system(size: 20, weight: .light))
+                            .symbolRenderingMode(.monochrome)
                             .foregroundStyle(Color.accentColor)
                     }
                 }
@@ -175,7 +177,8 @@ struct ClipboardCardView: View {
     private func chip(title: String, systemImage: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: systemImage)
-                .font(.caption.weight(.semibold))
+                .font(.caption.weight(.light))
+                .symbolRenderingMode(.monochrome)
                 .foregroundStyle(palette.secondaryText)
             Text(title)
                 .font(.caption)

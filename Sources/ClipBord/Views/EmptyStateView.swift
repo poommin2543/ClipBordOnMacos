@@ -19,7 +19,8 @@ struct EmptyStateView: View {
                     .frame(width: 72, height: 72)
 
                 Image(systemName: "square.on.square")
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: 26, weight: .light))
+                    .symbolRenderingMode(.monochrome)
                     .foregroundStyle(Color.accentColor)
             }
 

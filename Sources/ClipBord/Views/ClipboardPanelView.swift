@@ -193,8 +193,9 @@ struct ClipboardPanelView: View {
 
         case let .updateAvailable(versionLabel, remoteURL):
             HStack(spacing: 10) {
-                Image(systemName: "arrow.down.circle.fill")
-                    .font(.system(size: 14, weight: .semibold))
+                Image(systemName: "arrow.down.circle")
+                    .font(.system(size: 14, weight: .light))
+                    .symbolRenderingMode(.monochrome)
                     .foregroundStyle(.teal)
                 Text("Update available \(versionLabel)")
                     .font(.caption.weight(.semibold))

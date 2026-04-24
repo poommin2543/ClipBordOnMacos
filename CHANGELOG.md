@@ -2,6 +2,11 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.8 - 2026-04-24
+
+- Menu bar icon: render `square.on.square` via `NSImage.SymbolConfiguration` (`.ultraLight`) so the status item actually shows a thin stroke; SwiftUI-only modifiers on `MenuBarExtra` labels are often ignored.
+- Panel icons: prefer outline SF Symbols and lighter weights on cards (text/image previews, pin, trash, chips), empty state, and the update banner download icon.
+
 ## 0.1.7 - 2026-04-24
 
 - Card actions: separate pin and delete controls using themed SF Symbols (`ClipBordPalette`) instead of emoji.
