@@ -7,6 +7,7 @@ final class ClipBordAppController: ObservableObject {
     let store: ClipboardStore
     let hotKeySettings: HotKeySettings
     let themeSettings: ThemeSettings
+    let updateChecker: GitHubUpdateChecker
     let overlayController: ClipboardOverlayPanelController
 
     private var hotKeyMonitor: GlobalHotKeyMonitor?
@@ -15,15 +16,18 @@ final class ClipBordAppController: ObservableObject {
         let store = ClipboardStore()
         let hotKeySettings = HotKeySettings()
         let themeSettings = ThemeSettings()
+        let updateChecker = GitHubUpdateChecker()
         let overlayController = ClipboardOverlayPanelController(
             store: store,
             hotKeySettings: hotKeySettings,
-            themeSettings: themeSettings
+            themeSettings: themeSettings,
+            updateChecker: updateChecker
         )
 
         self.store = store
         self.hotKeySettings = hotKeySettings
         self.themeSettings = themeSettings
+        self.updateChecker = updateChecker
         self.overlayController = overlayController
 
         overlayController.onShortcutChange = { [weak self] configuration in

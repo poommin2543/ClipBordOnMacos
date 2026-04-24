@@ -16,9 +16,9 @@ enum ClipboardPanelPresentation {
     var panelHeight: CGFloat {
         switch self {
         case .menuBar:
-            470
+            502
         case .overlay:
-            500
+            532
         }
     }
 
@@ -35,6 +35,7 @@ struct ClipboardPanelView: View {
     @ObservedObject var store: ClipboardStore
     @ObservedObject var hotKeySettings: HotKeySettings
     @ObservedObject var themeSettings: ThemeSettings
+    @ObservedObject var updateChecker: GitHubUpdateChecker
     let presentation: ClipboardPanelPresentation
     let onShortcutChange: (HotKeyConfiguration) -> Void
     let onSelectItem: (ClipboardItem) -> Void
@@ -86,6 +87,9 @@ struct ClipboardPanelView: View {
                 }
             }
             .padding(14)
+            .onAppear {
+                updateChecker.checkIfNeeded()
+            }
         }
         .frame(width: presentation.panelWidth, height: presentation.panelHeight)
         .environment(\.colorScheme, effectiveColorScheme)
@@ -140,6 +144,8 @@ struct ClipboardPanelView: View {
                 }
             }
 
+            updateBanner
+
             HStack(spacing: 8) {
                 Text("Open popup")
                     .font(.caption)
@@ -156,6 +162,87 @@ struct ClipboardPanelView: View {
             .padding(.bottom, 2)
         }
         .padding(.bottom, 2)
+    }
+
+    @ViewBuilder
+    private var updateBanner: some View {
+        switch updateChecker.phase {
+        case .checking:
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                    .scaleEffect(0.9)
+                Text("Checking for updates…")
+                    .font(.caption)
+                    .foregroundStyle(palette.secondaryText)
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, 2)
+
+        case .downloading:
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                    .scaleEffect(0.9)
+                Text("Downloading update…")
+                    .font(.caption)
+                    .foregroundStyle(palette.secondaryText)
+                Spacer(minLength: 0)
+            }
+            .padding(.vertical, 2)
+
+        case let .updateAvailable(versionLabel, remoteURL):
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.down.circle.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.teal)
+                Text("Update available \(versionLabel)")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(palette.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                Spacer(minLength: 0)
+                if ClipBordReleaseInstaller.isRunningFromAppBundle {
+                    Button("Install & relaunch") {
+                        updateChecker.beginInstallUpdate()
+                    }
+                    .buttonStyle(.plain)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(palette.primaryText)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Rectangle()
+                            .fill(palette.subtleFill)
+                    )
+                    .overlay(
+                        Rectangle()
+                            .stroke(palette.separator, lineWidth: 1)
+                    )
+                } else {
+                    Button("Download") {
+                        updateChecker.openReleaseDownloadPage(remoteURL)
+                    }
+                    .buttonStyle(.plain)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(palette.primaryText)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Rectangle()
+                            .fill(palette.subtleFill)
+                    )
+                    .overlay(
+                        Rectangle()
+                            .stroke(palette.separator, lineWidth: 1)
+                    )
+                }
+            }
+            .padding(.vertical, 2)
+
+        default:
+            EmptyView()
+        }
     }
 
     private var themeMenu: some View {

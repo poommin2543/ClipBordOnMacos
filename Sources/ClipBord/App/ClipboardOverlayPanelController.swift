@@ -7,6 +7,7 @@ final class ClipboardOverlayPanelController {
     private let store: ClipboardStore
     private let hotKeySettings: HotKeySettings
     private let themeSettings: ThemeSettings
+    private let updateChecker: GitHubUpdateChecker
     private let autoPasteService = AutoPasteService()
     private let logger = Logger(subsystem: "com.sittinonthanonklang.ClipBord", category: "OverlayPanel")
     private var panel: ClipboardOverlayPanel?
@@ -14,10 +15,16 @@ final class ClipboardOverlayPanelController {
 
     var onShortcutChange: ((HotKeyConfiguration) -> Void)?
 
-    init(store: ClipboardStore, hotKeySettings: HotKeySettings, themeSettings: ThemeSettings) {
+    init(
+        store: ClipboardStore,
+        hotKeySettings: HotKeySettings,
+        themeSettings: ThemeSettings,
+        updateChecker: GitHubUpdateChecker
+    ) {
         self.store = store
         self.hotKeySettings = hotKeySettings
         self.themeSettings = themeSettings
+        self.updateChecker = updateChecker
     }
 
     func toggle() {
@@ -71,6 +78,7 @@ final class ClipboardOverlayPanelController {
                 store: store,
                 hotKeySettings: hotKeySettings,
                 themeSettings: themeSettings,
+                updateChecker: updateChecker,
                 presentation: .overlay,
                 onShortcutChange: { [weak self] configuration in
                     self?.onShortcutChange?(configuration)

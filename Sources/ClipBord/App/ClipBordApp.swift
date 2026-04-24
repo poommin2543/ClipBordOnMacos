@@ -14,6 +14,7 @@ struct ClipBordApp: App {
                 store: appController.store,
                 hotKeySettings: appController.hotKeySettings,
                 themeSettings: appController.themeSettings,
+                updateChecker: appController.updateChecker,
                 presentation: .menuBar,
                 onShortcutChange: { appController.updateHotKey($0) },
                 onSelectItem: { appController.store.restore($0) },

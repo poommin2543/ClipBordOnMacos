@@ -158,19 +158,26 @@ struct ClipboardCardView: View {
     }
 
     private func chip(title: String, systemImage: String) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.caption)
-            .foregroundStyle(palette.secondaryText)
-            .padding(.horizontal, 7)
-            .padding(.vertical, 4)
-            .background(
-                Rectangle()
-                    .fill(palette.subtleFill)
-            )
-            .overlay(
-                Rectangle()
-                    .stroke(palette.separator, lineWidth: 1)
-            )
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(palette.secondaryText)
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(palette.secondaryText)
+                .lineLimit(1)
+        }
+        .fixedSize(horizontal: true, vertical: false)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 4)
+        .background(
+            Rectangle()
+                .fill(palette.subtleFill)
+        )
+        .overlay(
+            Rectangle()
+                .stroke(palette.separator, lineWidth: 1)
+        )
     }
 
     private func actionButton(systemImage: String, tint: Color, action: @escaping () -> Void) -> some View {
