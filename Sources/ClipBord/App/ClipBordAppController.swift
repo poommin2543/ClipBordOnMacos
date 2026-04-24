@@ -35,6 +35,7 @@ final class ClipBordAppController: ObservableObject {
         }
 
         registerHotKey(hotKeySettings.configuration)
+        updateChecker.checkIfNeeded()
     }
 
     func updateHotKey(_ configuration: HotKeyConfiguration) {

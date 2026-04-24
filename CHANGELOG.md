@@ -2,6 +2,10 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.4 - 2026-04-24
+
+- Run the GitHub release check once when the app finishes launching (`ClipBordAppController`), in addition to when the menu bar panel opens; prevent overlapping checks with an in-flight flag.
+
 ## 0.1.3 - 2026-04-24
 
 - Fixed clipboard card footer layout so the relative time (for example “8 min ago”) stays on one line below the chips instead of stacking vertically.

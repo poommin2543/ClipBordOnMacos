@@ -8,7 +8,7 @@
 
 ClipBord is inspired by the Windows clipboard history feature. It captures copied text and images in the background, stores a scrollable history, and lets you restore any past entry into the active application with a single click. Everything is accessible from a keyboard shortcut that pops up a small, native-looking window right next to your cursor.
 
-Current version: `0.1.3`
+Current version: `0.1.4`
 
 ---
 
@@ -37,7 +37,7 @@ Current version: `0.1.3`
 
 ## Install from DMG
 
-1. Download **`ClipBord 0.1.3.dmg`** from the [Releases](../../releases) page.
+1. Download **`ClipBord 0.1.4.dmg`** from the [Releases](../../releases) page.
 2. Open the DMG file.
 3. Drag **ClipBord.app** into the **Applications** folder shortcut.
 4. Eject the DMG and launch **ClipBord** from Applications.
@@ -107,7 +107,7 @@ This command:
 Output file:
 
 ```
-dist/ClipBord 0.1.3.dmg
+dist/ClipBord 0.1.4.dmg
 ```
 
 ---
@@ -170,13 +170,13 @@ dist/                     Local build artefacts (git-ignored)
 
 ## Versioning
 
-This project follows [Semantic Versioning](https://semver.org/). The current release is `0.1.3`.
+This project follows [Semantic Versioning](https://semver.org/). The current release is `0.1.4`.
 
 **Build version** — `script/build_and_run.sh` and `script/package_dmg.sh` set `CFBundleShortVersionString` and the DMG file name from the **latest reachable Git tag** matching `v*` (for example `v0.1.1` → `0.1.1`), via `script/clipbord_version.sh`. If no such tag exists, the version falls back to `0.0.0`. Override anytime with `CLIPBORD_VERSION=1.2.3 ./script/package_dmg.sh`.
 
 GitHub Actions checks out the full history (`fetch-depth: 0`) so tags are visible to that resolver.
 
-**Update checks** — The app asks GitHub’s latest release API for `poommin2543/ClipBordOnMacos` when the panel opens (at most about once every three hours). If a newer version is published, **Install & relaunch** downloads the DMG, replaces the running `.app` where it lives, and opens the new build (you confirm in a dialog first). When running from `swift run` or a loose binary, the button stays **Download** and opens the DMG in your browser instead. To point at another fork, change `GitHubUpdateChecker.defaultRepository` in the source.
+**Update checks** — The app asks GitHub’s latest release API for `poommin2543/ClipBordOnMacos` when **the app launches** (`ClipBordAppController`) and again when **the menu bar panel appears** (`ClipboardPanelView`), but at most about once every three hours across both (stored in `UserDefaults`). If a newer version is published, **Install & relaunch** downloads the DMG, replaces the running `.app` where it lives, and opens the new build (you confirm in a dialog first). When running from `swift run` or a loose binary, the button stays **Download** and opens the DMG in your browser instead. To point at another fork, change `GitHubUpdateChecker.defaultRepository` in the source.
 
 See [CHANGELOG.md](CHANGELOG.md) for the full history of changes.
 

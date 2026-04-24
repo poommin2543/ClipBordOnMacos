@@ -23,6 +23,7 @@ final class GitHubUpdateChecker: ObservableObject {
 
     private var pendingVersionLabel: String?
     private var pendingRemoteURL: URL?
+    private var isReleaseCheckInFlight = false
 
     private let repository: String
     private let session: URLSession
@@ -35,9 +36,10 @@ final class GitHubUpdateChecker: ObservableObject {
         session = URLSession(configuration: configuration)
     }
 
-    /// Checks the API unless we recently checked successfully (rate‑friendly).
+    /// Checks the GitHub API unless a check is already running or the last successful check was recent.
+    /// Called from `ClipBordAppController` at launch and from `ClipboardPanelView` when the panel appears.
     func checkIfNeeded() {
-        guard phase != .checking, phase != .downloading else {
+        guard phase != .checking, phase != .downloading, !isReleaseCheckInFlight else {
             return
         }
 
@@ -47,8 +49,10 @@ final class GitHubUpdateChecker: ObservableObject {
             return
         }
 
-        Task {
-            await checkNow()
+        isReleaseCheckInFlight = true
+        Task { @MainActor [weak self] in
+            defer { self?.isReleaseCheckInFlight = false }
+            await self?.checkNow()
         }
     }
 
