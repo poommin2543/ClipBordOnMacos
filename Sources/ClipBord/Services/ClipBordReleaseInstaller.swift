@@ -33,6 +33,7 @@ enum ClipBordReleaseInstaller {
             "fi",
             "/bin/rm -rf \"$TARGET\"",
             "/usr/bin/ditto \"$MOUNT/ClipBord.app\" \"$TARGET\"",
+            "/usr/bin/xattr -dr com.apple.quarantine \"$TARGET\" 2>/dev/null || true",
             "/usr/bin/hdiutil detach \"$MOUNT\" -force -quiet || true",
             "/bin/rm -rf \"$MOUNT\"",
             "/usr/bin/open \"$TARGET\"",

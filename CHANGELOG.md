@@ -2,6 +2,12 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.1.6 - 2026-04-24
+
+- Check for a newer GitHub release on **every app launch** (no throttle); panel open still uses the 3-hour throttle.
+- When an update exists, show a **Download & install** alert at launch (once per version per run) so you are not required to open the menu bar panel first.
+- After in-place install, strip `com.apple.quarantine` on the replaced `.app` to reduce follow-up Gatekeeper friction (Accessibility still depends on stable Developer ID signing; see README).
+
 ## 0.1.5 - 2026-04-24
 
 - Moved the pin control next to the `…` menu on the top-right of each clipboard card so actions read as one toolbar instead of a floating pin at the bottom.

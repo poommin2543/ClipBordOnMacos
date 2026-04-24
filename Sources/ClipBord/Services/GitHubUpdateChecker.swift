@@ -37,7 +37,7 @@ final class GitHubUpdateChecker: ObservableObject {
     }
 
     /// Checks the GitHub API unless a check is already running or the last successful check was recent.
-    /// Called from `ClipBordAppController` at launch and from `ClipboardPanelView` when the panel appears.
+    /// Called from `ClipboardPanelView` when the panel appears.
     func checkIfNeeded() {
         guard phase != .checking, phase != .downloading, !isReleaseCheckInFlight else {
             return
@@ -46,6 +46,20 @@ final class GitHubUpdateChecker: ObservableObject {
         let now = Date()
         if let last = UserDefaults.standard.object(forKey: Self.lastCheckDefaultsKey) as? Date,
            now.timeIntervalSince(last) < Self.minimumCheckInterval {
+            return
+        }
+
+        isReleaseCheckInFlight = true
+        Task { @MainActor [weak self] in
+            defer { self?.isReleaseCheckInFlight = false }
+            await self?.checkNow()
+        }
+    }
+
+    /// Checks GitHub on every cold launch (no throttle) so a newer release is not missed for hours.
+    /// Still skips if another check is already in flight.
+    func checkOnColdLaunch() {
+        guard phase != .checking, phase != .downloading, !isReleaseCheckInFlight else {
             return
         }
 

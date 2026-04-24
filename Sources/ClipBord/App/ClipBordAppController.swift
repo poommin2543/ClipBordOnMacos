@@ -1,5 +1,6 @@
 import AppKit
 import Carbon
+import Combine
 import SwiftUI
 
 @MainActor
@@ -11,6 +12,8 @@ final class ClipBordAppController: ObservableObject {
     let overlayController: ClipboardOverlayPanelController
 
     private var hotKeyMonitor: GlobalHotKeyMonitor?
+    private var updatePhaseCancellable: AnyCancellable?
+    private var updateAlertVersionsOfferedThisSession = Set<String>()
 
     init() {
         let store = ClipboardStore()
@@ -34,8 +37,50 @@ final class ClipBordAppController: ObservableObject {
             self?.updateHotKey(configuration)
         }
 
+        updatePhaseCancellable = updateChecker.$phase
+            .receive(on: RunLoop.main)
+            .sink { [weak self] phase in
+                self?.considerPresentingLaunchUpdateAlert(for: phase)
+            }
+
         registerHotKey(hotKeySettings.configuration)
-        updateChecker.checkIfNeeded()
+        updateChecker.checkOnColdLaunch()
+    }
+
+    private func considerPresentingLaunchUpdateAlert(for phase: GitHubUpdateChecker.Phase) {
+        guard case let .updateAvailable(versionLabel, _) = phase else {
+            return
+        }
+
+        guard !updateAlertVersionsOfferedThisSession.contains(versionLabel) else {
+            return
+        }
+
+        updateAlertVersionsOfferedThisSession.insert(versionLabel)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
+            guard let self else {
+                return
+            }
+
+            guard case let .updateAvailable(stillLabel, _) = self.updateChecker.phase, stillLabel == versionLabel else {
+                return
+            }
+
+            NSApp.activate(ignoringOtherApps: true)
+
+            let alert = NSAlert()
+            alert.messageText = "Update available"
+            alert.informativeText =
+                "ClipBord \(versionLabel) is ready. Download & install replaces this app in place and relaunches it. If you use a Developer ID–signed build at the same path, macOS usually keeps Accessibility; ad‑hoc signed builds may need to be allowed again."
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "Download & install")
+            alert.addButton(withTitle: "Not now")
+
+            if alert.runModal() == .alertFirstButtonReturn {
+                self.updateChecker.beginInstallUpdate()
+            }
+        }
     }
 
     func updateHotKey(_ configuration: HotKeyConfiguration) {
