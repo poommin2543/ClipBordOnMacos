@@ -28,20 +28,26 @@ struct ClipboardCardView: View {
                             .multilineTextAlignment(.leading)
                             .lineLimit(item.kind == .text ? 3 : 2)
 
-                        HStack(spacing: 8) {
-                            if item.isPinned {
-                                chip(title: "Pinned", systemImage: "pin.fill")
-                            }
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(spacing: 8) {
+                                if item.isPinned {
+                                    chip(title: "Pinned", systemImage: "pin.fill")
+                                }
 
-                            if let imageDimensionsLabel = item.imageDimensionsLabel {
-                                chip(title: imageDimensionsLabel, systemImage: "photo")
-                            } else if item.kind == .text {
-                                chip(title: "\(item.textCharacterCount) chars", systemImage: "text.alignleft")
+                                if let imageDimensionsLabel = item.imageDimensionsLabel {
+                                    chip(title: imageDimensionsLabel, systemImage: "photo")
+                                } else if item.kind == .text {
+                                    chip(title: "\(item.textCharacterCount) chars", systemImage: "text.alignleft")
+                                }
+
+                                Spacer(minLength: 0)
                             }
 
                             Text(ClipBordDateFormatting.relativeString(for: item.updatedAt))
                                 .font(.caption)
                                 .foregroundStyle(palette.tertiaryText)
+                                .lineLimit(1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
