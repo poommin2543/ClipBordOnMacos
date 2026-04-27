@@ -5,6 +5,7 @@ struct ClipboardCardView: View {
     let item: ClipboardItem
     let imageURL: URL?
     let onRestore: () -> Void
+    let onShowDetails: () -> Void
     let onTogglePin: () -> Void
     let onDelete: () -> Void
 
@@ -16,9 +17,9 @@ struct ClipboardCardView: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 10) {
             Button(action: onRestore) {
-                HStack(alignment: .top, spacing: 12) {
+                HStack(alignment: .top, spacing: 10) {
                     preview
 
                     VStack(alignment: .leading, spacing: 7) {
@@ -42,6 +43,8 @@ struct ClipboardCardView: View {
 
                                 Spacer(minLength: 0)
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .clipped()
 
                             Text(ClipBordDateFormatting.relativeString(for: item.updatedAt))
                                 .font(.caption)
@@ -51,12 +54,34 @@ struct ClipboardCardView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .layoutPriority(0)
                 }
                 .contentShape(Rectangle())
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
 
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
+                Button(action: onShowDetails) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 13, weight: .light))
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundStyle(palette.secondaryText)
+                        .frame(width: 28, height: 28)
+                        .background(
+                            Rectangle()
+                                .fill(palette.subtleFill)
+                        )
+                        .overlay(
+                            Rectangle()
+                                .stroke(palette.separator, lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Show details")
+
                 Button(action: onTogglePin) {
                     Image(systemName: "pin")
                         .font(.system(size: 13, weight: .light))
@@ -93,8 +118,10 @@ struct ClipboardCardView: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("Delete")
             }
+            .fixedSize(horizontal: true, vertical: false)
             .opacity(isHovered ? 1 : 0.88)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .background(
             Rectangle()
@@ -184,8 +211,9 @@ struct ClipboardCardView: View {
                 .font(.caption)
                 .foregroundStyle(palette.secondaryText)
                 .lineLimit(1)
+                .truncationMode(.tail)
         }
-        .fixedSize(horizontal: true, vertical: false)
+        .layoutPriority(0)
         .padding(.horizontal, 7)
         .padding(.vertical, 4)
         .background(

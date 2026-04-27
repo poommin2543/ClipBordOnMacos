@@ -7,6 +7,7 @@ import SwiftUI
 final class ClipBordAppController: ObservableObject {
     let store: ClipboardStore
     let hotKeySettings: HotKeySettings
+    let retentionSettings: RetentionSettings
     let themeSettings: ThemeSettings
     let updateChecker: GitHubUpdateChecker
     let overlayController: ClipboardOverlayPanelController
@@ -16,19 +17,22 @@ final class ClipBordAppController: ObservableObject {
     private var updateAlertVersionsOfferedThisSession = Set<String>()
 
     init() {
-        let store = ClipboardStore()
+        let retentionSettings = RetentionSettings()
+        let store = ClipboardStore(retentionSettings: retentionSettings)
         let hotKeySettings = HotKeySettings()
         let themeSettings = ThemeSettings()
         let updateChecker = GitHubUpdateChecker()
         let overlayController = ClipboardOverlayPanelController(
             store: store,
             hotKeySettings: hotKeySettings,
+            retentionSettings: retentionSettings,
             themeSettings: themeSettings,
             updateChecker: updateChecker
         )
 
         self.store = store
         self.hotKeySettings = hotKeySettings
+        self.retentionSettings = retentionSettings
         self.themeSettings = themeSettings
         self.updateChecker = updateChecker
         self.overlayController = overlayController

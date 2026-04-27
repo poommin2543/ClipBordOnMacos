@@ -2,6 +2,14 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.2.0 - 2026-04-27
+
+- Clipboard history search: filter saved text and image metadata directly in the popup, with a dedicated no-match state.
+- Retention controls: configure max unpinned history count and max age from the header settings menu; pinned clips are always kept.
+- Preview detail panel: inspect full text or larger image previews without changing the default click-to-paste behavior, with Copy, Pin/Unpin, Delete, and close actions.
+- Layout polish: fixed preview close behavior, compacted inline preview sizing, and prevented pinned cards from expanding the panel off screen.
+- Release pipeline: added Developer ID signing and notarization scaffolding for GitHub releases while preserving ad-hoc fallback packaging when secrets are not configured.
+
 ## 0.1.10 - 2026-04-24
 
 - In-app update: after the DMG download completes, ClipBord quits and installs **without a second confirmation dialog** (one explicit “Download & install” / “Update now” is enough).

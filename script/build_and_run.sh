@@ -28,13 +28,26 @@ clear_bundle_xattrs() {
 sign_bundle() {
   local bundle_path="$1"
   local signing_identity
-  signing_identity="$(/usr/bin/security find-identity -v -p codesigning 2>/dev/null | /usr/bin/awk -F '\"' '/Apple Development|Developer ID Application/ { print $2; exit }')"
+  signing_identity="${CLIPBORD_SIGNING_IDENTITY:-}"
+
+  if [[ -z "$signing_identity" ]]; then
+    signing_identity="$(/usr/bin/security find-identity -v -p codesigning 2>/dev/null | /usr/bin/awk -F '"' '/Developer ID Application/ { print $2; exit }')"
+  fi
+
+  if [[ -z "$signing_identity" ]]; then
+    signing_identity="$(/usr/bin/security find-identity -v -p codesigning 2>/dev/null | /usr/bin/awk -F '"' '/Apple Development/ { print $2; exit }')"
+  fi
+
+  local codesign_args=(--force --deep)
+  if [[ "$signing_identity" == Developer\ ID\ Application:* ]]; then
+    codesign_args+=(--options runtime --timestamp)
+  fi
 
   for _ in 1 2 3; do
     clear_bundle_xattrs "$bundle_path"
 
-    if [[ -n "$signing_identity" ]]; then
-      /usr/bin/codesign --force --deep --sign "$signing_identity" "$bundle_path" >/dev/null 2>&1 && return 0
+    if [[ -n "$signing_identity" && "$signing_identity" != "-" ]]; then
+      /usr/bin/codesign "${codesign_args[@]}" --sign "$signing_identity" "$bundle_path" >/dev/null 2>&1 && return 0
     else
       /usr/bin/codesign --force --deep --sign - "$bundle_path" >/dev/null 2>&1 && return 0
     fi
@@ -43,8 +56,8 @@ sign_bundle() {
   done
 
   clear_bundle_xattrs "$bundle_path"
-  if [[ -n "$signing_identity" ]]; then
-    /usr/bin/codesign --force --deep --sign "$signing_identity" "$bundle_path" >/dev/null
+  if [[ -n "$signing_identity" && "$signing_identity" != "-" ]]; then
+    /usr/bin/codesign "${codesign_args[@]}" --sign "$signing_identity" "$bundle_path" >/dev/null
   else
     /usr/bin/codesign --force --deep --sign - "$bundle_path" >/dev/null
   fi

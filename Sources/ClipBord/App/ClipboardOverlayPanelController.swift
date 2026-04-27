@@ -6,6 +6,7 @@ import os
 final class ClipboardOverlayPanelController {
     private let store: ClipboardStore
     private let hotKeySettings: HotKeySettings
+    private let retentionSettings: RetentionSettings
     private let themeSettings: ThemeSettings
     private let updateChecker: GitHubUpdateChecker
     private let autoPasteService = AutoPasteService()
@@ -18,11 +19,13 @@ final class ClipboardOverlayPanelController {
     init(
         store: ClipboardStore,
         hotKeySettings: HotKeySettings,
+        retentionSettings: RetentionSettings,
         themeSettings: ThemeSettings,
         updateChecker: GitHubUpdateChecker
     ) {
         self.store = store
         self.hotKeySettings = hotKeySettings
+        self.retentionSettings = retentionSettings
         self.themeSettings = themeSettings
         self.updateChecker = updateChecker
     }
@@ -77,6 +80,7 @@ final class ClipboardOverlayPanelController {
             rootView: ClipboardPanelView(
                 store: store,
                 hotKeySettings: hotKeySettings,
+                retentionSettings: retentionSettings,
                 themeSettings: themeSettings,
                 updateChecker: updateChecker,
                 presentation: .overlay,

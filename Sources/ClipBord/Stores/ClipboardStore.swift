@@ -1,18 +1,19 @@
 import AppKit
+import Combine
 import Foundation
 import os
 
 @MainActor
 final class ClipboardStore: ObservableObject {
-    static let maximumRecentItems = 60
-
     @Published private(set) var items: [ClipboardItem] = []
     @Published private(set) var statusMessage = "Watching your clipboard"
 
     private let logger = Logger(subsystem: "com.sittinonthanonklang.ClipBord", category: "ClipboardStore")
     private let fileManager = FileManager.default
+    private let retentionSettings: RetentionSettings
     private let historyURL: URL
     private let imageDirectoryURL: URL
+    private var cancellables = Set<AnyCancellable>()
 
     private let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
@@ -29,7 +30,9 @@ final class ClipboardStore: ObservableObject {
 
     private var pasteboardMonitor: PasteboardMonitor?
 
-    init() {
+    init(retentionSettings: RetentionSettings) {
+        self.retentionSettings = retentionSettings
+
         let baseURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("ClipBord", isDirectory: true)
 
@@ -38,6 +41,8 @@ final class ClipboardStore: ObservableObject {
 
         prepareStorage()
         loadItems()
+        applyRetentionPolicy(persistWhenChanged: true)
+        observeRetentionChanges()
 
         pasteboardMonitor = PasteboardMonitor { [weak self] capture in
             self?.ingest(capture)
@@ -186,7 +191,7 @@ final class ClipboardStore: ObservableObject {
         }
 
         items.insert(item, at: 0)
-        trimIfNeeded()
+        applyRetentionPolicy(persistWhenChanged: false)
         items = sortItems(items)
         persistItems()
         statusMessage = capture.kind == .text ? "Saved a new text clip" : "Saved a new image clip"
@@ -250,19 +255,50 @@ final class ClipboardStore: ObservableObject {
         }
     }
 
-    private func trimIfNeeded() {
-        let pinned = items.filter(\.isPinned)
-        let recent = items.filter { !$0.isPinned }
+    private func observeRetentionChanges() {
+        retentionSettings.$maximumUnpinnedItems
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.applyRetentionPolicy(persistWhenChanged: true)
+            }
+            .store(in: &cancellables)
 
-        guard recent.count > Self.maximumRecentItems else {
+        retentionSettings.$maximumUnpinnedAgeDays
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.applyRetentionPolicy(persistWhenChanged: true)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func applyRetentionPolicy(persistWhenChanged: Bool) {
+        let pinned = items.filter(\.isPinned)
+        var keptRecent = items.filter { !$0.isPinned }
+        var removedItems: [ClipboardItem] = []
+
+        let maximumAgeDays = retentionSettings.maximumUnpinnedAgeDays
+        if maximumAgeDays > RetentionSettings.unlimited,
+           let cutoff = Calendar.current.date(byAdding: .day, value: -maximumAgeDays, to: Date()) {
+            let partition = keptRecent.partitioned { $0.updatedAt >= cutoff }
+            keptRecent = partition.matching
+            removedItems.append(contentsOf: partition.rejected)
+        }
+
+        let maximumItems = retentionSettings.maximumUnpinnedItems
+        if maximumItems > RetentionSettings.unlimited, keptRecent.count > maximumItems {
+            removedItems.append(contentsOf: keptRecent.dropFirst(maximumItems))
+            keptRecent = Array(keptRecent.prefix(maximumItems))
+        }
+
+        guard !removedItems.isEmpty else {
             return
         }
 
-        let keptRecent = Array(recent.prefix(Self.maximumRecentItems))
-        let removedItems = Array(recent.dropFirst(Self.maximumRecentItems))
-
-        items = pinned + keptRecent
+        items = sortItems(pinned + keptRecent)
         removeAssets(for: removedItems)
+        if persistWhenChanged {
+            persistItems()
+        }
     }
 
     private func removeAssets(for items: [ClipboardItem]) {
@@ -287,5 +323,22 @@ final class ClipboardStore: ObservableObject {
 
             return lhs.updatedAt > rhs.updatedAt
         }
+    }
+}
+
+private extension Array {
+    func partitioned(_ isIncluded: (Element) -> Bool) -> (matching: [Element], rejected: [Element]) {
+        var matching: [Element] = []
+        var rejected: [Element] = []
+
+        for element in self {
+            if isIncluded(element) {
+                matching.append(element)
+            } else {
+                rejected.append(element)
+            }
+        }
+
+        return (matching, rejected)
     }
 }

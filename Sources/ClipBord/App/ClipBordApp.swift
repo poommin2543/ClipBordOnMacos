@@ -30,6 +30,7 @@ struct ClipBordApp: App {
             ClipboardPanelView(
                 store: appController.store,
                 hotKeySettings: appController.hotKeySettings,
+                retentionSettings: appController.retentionSettings,
                 themeSettings: appController.themeSettings,
                 updateChecker: appController.updateChecker,
                 presentation: .menuBar,

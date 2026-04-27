@@ -8,7 +8,7 @@
 
 ClipBord is inspired by the Windows clipboard history feature. It captures copied text and images in the background, stores a scrollable history, and lets you restore any past entry into the active application with a single click. Everything is accessible from a keyboard shortcut that pops up a small, native-looking window right next to your cursor.
 
-Current version: `0.1.10`
+Current version: `0.2.0`
 
 ---
 
@@ -18,12 +18,15 @@ Current version: `0.1.10`
 |---------|--------|
 | **Menu bar app** | Runs silently in the menu bar — no Dock icon |
 | **Text & image capture** | Stores both plain text and image clipboard entries |
+| **History search** | Filters saved text and image metadata from the popup |
+| **Preview details** | Opens full text or larger image previews without changing click-to-paste |
+| **Retention controls** | Configurable cleanup for unpinned recent items; pinned clips are always kept |
 | **Global shortcut** | Default `Option + V`; fully customisable |
 | **Cursor-relative popup** | History window appears near the mouse pointer |
 | **One-click paste** | Click any item to copy it back and paste it immediately |
 | **Appearance modes** | Light, dark, or follows the system setting |
 | **Clean macOS UI** | Native SwiftUI components with a custom app icon |
-| **DMG distribution** | Packaged as a drag-and-drop DMG for easy sharing |
+| **DMG distribution** | Packaged as a drag-and-drop DMG, with Developer ID/notarization hooks for releases |
 
 ---
 
@@ -37,7 +40,7 @@ Current version: `0.1.10`
 
 ## Install from DMG
 
-1. Download **`ClipBord 0.1.10.dmg`** from the [Releases](../../releases) page.
+1. Download **`ClipBord 0.2.0.dmg`** from the [Releases](../../releases) page.
 2. Open the DMG file.
 3. Drag **ClipBord.app** into the **Applications** folder shortcut.
 4. Eject the DMG and launch **ClipBord** from Applications.
@@ -103,12 +106,30 @@ This command:
 2. Copies the `.app` bundle to a temporary staging directory.
 3. Clears extended attributes and signs the bundle.
 4. Creates a compressed DMG in `dist/`.
+5. Notarises and staples the DMG when Developer ID and Apple notarisation credentials are configured.
 
 Output file:
 
 ```
-dist/ClipBord 0.1.10.dmg
+dist/ClipBord 0.2.0.dmg
 ```
+
+### 5. Developer ID signing and notarisation
+
+Local builds and CI releases fall back to ad-hoc signing when Developer ID credentials are not present. To produce a notarised GitHub release, add these repository secrets:
+
+| Secret | Purpose |
+|--------|---------|
+| `MACOS_CERTIFICATE_BASE64` | Base64-encoded `.p12` Developer ID Application certificate |
+| `MACOS_CERTIFICATE_PASSWORD` | Password for the `.p12` certificate |
+| `MACOS_KEYCHAIN_PASSWORD` | Temporary CI keychain password |
+| `MACOS_SIGNING_IDENTITY` | Exact identity, e.g. `Developer ID Application: Your Name (TEAMID)` |
+| `APPLE_ID` | Apple ID used for notarisation |
+| `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password for notarisation |
+| `APPLE_TEAM_ID` | Apple Developer Team ID |
+| `CLIPBORD_ENABLE_NOTARIZATION` | Optional; set to `1` to fail if notarisation cannot run, or leave empty for auto/fallback |
+
+`script/package_dmg.sh` signs with `--options runtime --timestamp` for Developer ID identities. If the signing identity or notary credentials are missing, the script still creates an ad-hoc signed DMG for testing.
 
 ---
 
@@ -138,7 +159,7 @@ To grant it:
 
 > **After rebuilding from source** — macOS ties the Accessibility grant to the code signature. An ad-hoc signed build may receive a new identity each time. If auto-paste stops working after a rebuild, remove ClipBord from the Accessibility list and add the newly built app again.
 
-> **In-place updates** — The built-in updater replaces the `.app` at the same path. macOS is most likely to **keep Accessibility and other privacy toggles** when the new build is signed with the **same Apple Developer ID team** as before. **Ad-hoc (`codesign -`)** or a different team ID usually looks like a new app to the system, so you may need to enable Accessibility again. CI/DMG builds in this repo are ad-hoc unless you wire in your own signing.
+> **In-place updates** — The built-in updater replaces the `.app` at the same path. macOS is most likely to **keep Accessibility and other privacy toggles** when the new build is signed with the **same Apple Developer ID team** as before. **Ad-hoc (`codesign -`)** or a different team ID usually looks like a new app to the system, so you may need to enable Accessibility again. CI/DMG builds fall back to ad-hoc signing unless the Developer ID secrets above are configured.
 
 ---
 
@@ -172,7 +193,7 @@ dist/                     Local build artefacts (git-ignored)
 
 ## Versioning
 
-This project follows [Semantic Versioning](https://semver.org/). The current release is `0.1.10`.
+This project follows [Semantic Versioning](https://semver.org/). The current release is `0.2.0`.
 
 **Build version** — `script/build_and_run.sh` and `script/package_dmg.sh` set `CFBundleShortVersionString` and the DMG file name from the **latest reachable Git tag** matching `v*` (for example `v0.1.1` → `0.1.1`), via `script/clipbord_version.sh`. If no such tag exists, the version falls back to `0.0.0`. Override anytime with `CLIPBORD_VERSION=1.2.3 ./script/package_dmg.sh`.
 

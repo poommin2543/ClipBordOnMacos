@@ -34,6 +34,7 @@ enum ClipboardPanelPresentation {
 struct ClipboardPanelView: View {
     @ObservedObject var store: ClipboardStore
     @ObservedObject var hotKeySettings: HotKeySettings
+    @ObservedObject var retentionSettings: RetentionSettings
     @ObservedObject var themeSettings: ThemeSettings
     @ObservedObject var updateChecker: GitHubUpdateChecker
     let presentation: ClipboardPanelPresentation
@@ -43,6 +44,8 @@ struct ClipboardPanelView: View {
     let onQuit: (() -> Void)?
 
     @Environment(\.colorScheme) private var colorScheme
+    @State private var searchText = ""
+    @State private var selectedDetailItem: ClipboardItem?
 
     private var effectiveColorScheme: ColorScheme {
         themeSettings.theme.resolvedColorScheme(systemScheme: colorScheme)
@@ -50,6 +53,25 @@ struct ClipboardPanelView: View {
 
     private var palette: ClipBordPalette {
         ClipBordPalette(scheme: effectiveColorScheme)
+    }
+
+    private var normalizedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var filteredItems: [ClipboardItem] {
+        let query = normalizedSearchText
+        guard !query.isEmpty else {
+            return store.items
+        }
+
+        return store.items.filter {
+            $0.searchableText.localizedCaseInsensitiveContains(query)
+        }
+    }
+
+    private var isShowingDetail: Bool {
+        selectedDetailItem != nil
     }
 
     var body: some View {
@@ -64,17 +86,42 @@ struct ClipboardPanelView: View {
             VStack(spacing: 12) {
                 header
 
-                if store.items.isEmpty {
+                if let detailItem = selectedDetailItem {
+                    let currentItem = store.items.first(where: { $0.id == detailItem.id }) ?? detailItem
+                    ClipboardDetailView(
+                        item: currentItem,
+                        imageURL: store.imageURL(for: currentItem),
+                        onRestore: {
+                            onSelectItem(currentItem)
+                            selectedDetailItem = nil
+                        },
+                        onTogglePin: {
+                            store.togglePin(currentItem)
+                        },
+                        onDelete: {
+                            store.delete(currentItem)
+                            selectedDetailItem = nil
+                        },
+                        onClose: {
+                            selectedDetailItem = nil
+                        }
+                    )
+                } else if store.items.isEmpty {
                     EmptyStateView()
+                } else if filteredItems.isEmpty {
+                    noMatchesView
                 } else {
                     ScrollView {
                         VStack(spacing: 12) {
-                            ForEach(store.items) { item in
+                            ForEach(filteredItems) { item in
                                 ClipboardCardView(
                                     item: item,
                                     imageURL: store.imageURL(for: item),
                                     onRestore: {
                                         onSelectItem(item)
+                                    },
+                                    onShowDetails: {
+                                        selectedDetailItem = item
                                     },
                                     onTogglePin: { store.togglePin(item) },
                                     onDelete: { store.delete(item) }
@@ -115,6 +162,8 @@ struct ClipboardPanelView: View {
 
                 Spacer(minLength: 0)
 
+                retentionMenu
+
                 themeMenu
 
                 Button("Clear all") {
@@ -146,22 +195,87 @@ struct ClipboardPanelView: View {
 
             updateBanner
 
-            HStack(spacing: 8) {
-                Text("Open popup")
-                    .font(.caption)
-                    .foregroundStyle(palette.secondaryText)
-
-                ShortcutRecorderButton(
-                    settings: hotKeySettings,
-                    palette: palette,
-                    onShortcutChange: onShortcutChange
-                )
-
-                Spacer(minLength: 0)
+            if !store.items.isEmpty, !isShowingDetail {
+                searchField
             }
-            .padding(.bottom, 2)
+
+            if !isShowingDetail {
+                HStack(spacing: 8) {
+                    Text("Open popup")
+                        .font(.caption)
+                        .foregroundStyle(palette.secondaryText)
+
+                    ShortcutRecorderButton(
+                        settings: hotKeySettings,
+                        palette: palette,
+                        onShortcutChange: onShortcutChange
+                    )
+
+                    Spacer(minLength: 0)
+                }
+                .padding(.bottom, 2)
+            }
         }
         .padding(.bottom, 2)
+    }
+
+    private var searchField: some View {
+        HStack(spacing: 7) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12, weight: .regular))
+                .foregroundStyle(palette.secondaryText)
+
+            TextField("Search history", text: $searchText)
+                .textFieldStyle(.plain)
+                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .foregroundStyle(palette.primaryText)
+
+            if !normalizedSearchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle")
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(palette.secondaryText)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            Rectangle()
+                .fill(palette.subtleFill)
+        )
+        .overlay(
+            Rectangle()
+                .stroke(palette.separator, lineWidth: 1)
+        )
+    }
+
+    private var noMatchesView: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 24, weight: .light))
+                .foregroundStyle(Color.accentColor)
+            Text("No matches")
+                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                .foregroundStyle(palette.primaryText)
+            Text("Try another search term.")
+                .font(.callout)
+                .foregroundStyle(palette.secondaryText)
+        }
+        .frame(maxWidth: .infinity, minHeight: 220)
+        .padding(22)
+        .background(
+            Rectangle()
+                .fill(palette.cardBackground)
+                .overlay(
+                    Rectangle()
+                        .stroke(palette.separator, lineWidth: 1)
+                )
+        )
     }
 
     @ViewBuilder
@@ -269,6 +383,43 @@ struct ClipboardPanelView: View {
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
+    }
+
+    private var retentionMenu: some View {
+        Menu {
+            Picker("Max recent items", selection: $retentionSettings.maximumUnpinnedItems) {
+                ForEach(RetentionSettings.countOptions, id: \.value) { option in
+                    Text(option.title).tag(option.value)
+                }
+            }
+
+            Picker("Max age", selection: $retentionSettings.maximumUnpinnedAgeDays) {
+                ForEach(RetentionSettings.ageOptions, id: \.value) { option in
+                    Text(option.title).tag(option.value)
+                }
+            }
+
+            Divider()
+
+            Text("Pinned items are always kept")
+            Text(retentionSettings.summary)
+        } label: {
+            Image(systemName: "slider.horizontal.3")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(palette.primaryText)
+                .frame(width: 29, height: 29)
+                .background(
+                    Rectangle()
+                        .fill(palette.subtleFill)
+                )
+                .overlay(
+                    Rectangle()
+                        .stroke(palette.separator, lineWidth: 1)
+                )
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .accessibilityLabel("Retention settings")
     }
 
     private var themeIconName: String {
