@@ -6,6 +6,10 @@
 
 > A minimal macOS clipboard history manager — live in your menu bar, always one shortcut away.
 
+<p align="center">
+  <img src="Resources/screenshot.png" alt="ClipBord Preview" width="600">
+</p>
+
 ClipBord is inspired by the Windows clipboard history feature. It captures copied text and images in the background, stores a scrollable history, and lets you restore any past entry into the active application with a single click. Everything is accessible from a keyboard shortcut that pops up a small, native-looking window right next to your cursor.
 
 Current version: `0.2.2`
@@ -14,19 +18,28 @@ Current version: `0.2.2`
 
 ## Features
 
-| Feature | Detail |
-|---------|--------|
-| **Menu bar app** | Runs silently in the menu bar — no Dock icon |
-| **Text & image capture** | Stores both plain text and image clipboard entries |
-| **History search** | Filters saved text and image metadata from the popup |
-| **Preview details** | Opens full text or larger image previews without changing click-to-paste |
-| **Retention controls** | Configurable cleanup for unpinned recent items; pinned clips are always kept |
-| **Global shortcut** | Default `Option + V`; fully customisable |
-| **Cursor-relative popup** | History window appears near the mouse pointer |
-| **One-click paste** | Click any item to copy it back and paste it immediately |
-| **Appearance modes** | Light, dark, or follows the system setting |
-| **Clean macOS UI** | Native SwiftUI components with a custom app icon |
-| **DMG distribution** | Packaged as a drag-and-drop DMG, with Developer ID/notarization hooks for releases |
+### 🚀 Quick Access & Efficiency
+- **Menu Bar App**: Runs silently in the menu bar, keeping your Dock clean.
+- **Global Shortcut**: Default `Option + V` pops up the history window instantly. Fully customizable to fit your workflow.
+- **Cursor-Relative Popup**: The history window appears right next to your mouse pointer, so you don't have to move your eyes across the screen.
+- **One-Click Paste**: Click any item to copy it back to the clipboard and paste it immediately into your active app.
+
+### 📋 Smart History
+- **Text & Image Capture**: Seamlessly stores both plain text and image clipboard entries.
+- **Persistent History**: Your clipboard history is saved to disk and persists across system restarts.
+- **Pinned Items**: "Pin" important snippets to keep them forever. Pinned items are exempt from automatic cleanup.
+- **Searchable History**: Quickly filter through your saved clips using the built-in search bar.
+
+### 🎨 Modern macOS Experience
+- **Native SwiftUI UI**: Built with native components for a sleek, premium feel that matches macOS perfectly.
+- **Appearance Modes**: Supports Light, Dark, and System modes.
+- **Rich Previews**: See full text or larger image previews without losing your place.
+- **Automatic Updates**: Stay up to date with built-in version checking and easy installation from GitHub.
+
+### 🛠 Control & Customization
+- **Retention Controls**: Configurable limits on how many items to keep or how long to store unpinned entries.
+- **Accessibility Integration**: Uses macOS Accessibility features to provide a smooth "paste-on-click" experience.
+- **Privacy First**: Everything is stored locally on your machine.
 
 ---
 
