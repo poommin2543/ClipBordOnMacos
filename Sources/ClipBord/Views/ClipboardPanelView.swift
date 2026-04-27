@@ -7,9 +7,9 @@ enum ClipboardPanelPresentation {
     var panelWidth: CGFloat {
         switch self {
         case .menuBar:
-            360
+            390
         case .overlay:
-            380
+            390
         }
     }
 
@@ -146,13 +146,13 @@ struct ClipboardPanelView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .center, spacing: 10) {
+            HStack(alignment: .center, spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("ClipBord")
                         .font(.system(size: 22, weight: .semibold, design: .rounded))
                         .foregroundStyle(palette.primaryText)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                        .minimumScaleFactor(0.65)
 
                     Text(AppVersion.displayLabel)
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
@@ -172,6 +172,8 @@ struct ClipboardPanelView: View {
                 .buttonStyle(.plain)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(store.hasItemsToClear ? palette.primaryText : palette.secondaryText.opacity(0.55))
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 7)
                 .background(

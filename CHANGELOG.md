@@ -2,6 +2,12 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.2.1 - 2026-04-27
+
+- Menu bar UI: matched menu bar and shortcut overlay panel widths so release builds look like the dev popup.
+- Header layout: kept `Clear all` on one line after adding retention and theme controls, preventing the header from wrapping in packaged builds.
+- Panel sizing: reduced header spacing and allowed the title to shrink before action controls overflow.
+
 ## 0.2.0 - 2026-04-27
 
 - Clipboard history search: filter saved text and image metadata directly in the popup, with a dedicated no-match state.
