@@ -69,7 +69,7 @@ Current version: `0.2.2`
 
 ```bash
 git clone https://github.com/poommin2543/ClipBordOnMacos.git
-cd ClipBord
+cd ClipBordOnMacos
 ```
 
 ### 2. Compile (Swift Package Manager)
