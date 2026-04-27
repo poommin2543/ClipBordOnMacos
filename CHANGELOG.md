@@ -2,6 +2,11 @@
 
 All notable changes to ClipBord are documented here.
 
+## 0.2.2 - 2026-04-27
+
+- Header alignment: grouped retention settings, theme, Clear all, and power/close controls into a single right-aligned action cluster.
+- Layout polish: let the ClipBord title shrink before action controls move, keeping the packaged menu bar UI aligned with the dev popup.
+
 ## 0.2.1 - 2026-04-27
 
 - Menu bar UI: matched menu bar and shortcut overlay panel widths so release builds look like the dev popup.

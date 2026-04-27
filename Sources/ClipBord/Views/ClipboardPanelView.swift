@@ -146,7 +146,7 @@ struct ClipboardPanelView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .center, spacing: 8) {
+            HStack(alignment: .center, spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("ClipBord")
                         .font(.system(size: 22, weight: .semibold, design: .rounded))
@@ -158,41 +158,11 @@ struct ClipboardPanelView: View {
                         .font(.system(size: 11, weight: .medium, design: .monospaced))
                         .foregroundStyle(palette.secondaryText.opacity(0.9))
                 }
-                .layoutPriority(1)
+                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
 
                 Spacer(minLength: 0)
 
-                retentionMenu
-
-                themeMenu
-
-                Button("Clear all") {
-                    store.clearAllVisibleItems()
-                }
-                .buttonStyle(.plain)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(store.hasItemsToClear ? palette.primaryText : palette.secondaryText.opacity(0.55))
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(
-                    Rectangle()
-                        .fill(palette.subtleFill)
-                )
-                .overlay(
-                    Rectangle()
-                        .stroke(palette.separator, lineWidth: 1)
-                )
-                .disabled(!store.hasItemsToClear)
-
-                if presentation.showsCloseButton {
-                    iconButton(systemImage: "xmark", action: { onClose?() })
-                }
-
-                if presentation.showsQuitButton {
-                    iconButton(systemImage: "power", action: { onQuit?() })
-                }
+                headerActions
             }
 
             updateBanner
@@ -219,6 +189,43 @@ struct ClipboardPanelView: View {
             }
         }
         .padding(.bottom, 2)
+    }
+
+    private var headerActions: some View {
+        HStack(alignment: .center, spacing: 8) {
+            retentionMenu
+
+            themeMenu
+
+            Button("Clear all") {
+                store.clearAllVisibleItems()
+            }
+            .buttonStyle(.plain)
+            .font(.system(size: 13, weight: .medium, design: .rounded))
+            .foregroundStyle(store.hasItemsToClear ? palette.primaryText : palette.secondaryText.opacity(0.55))
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(
+                Rectangle()
+                    .fill(palette.subtleFill)
+            )
+            .overlay(
+                Rectangle()
+                    .stroke(palette.separator, lineWidth: 1)
+            )
+            .disabled(!store.hasItemsToClear)
+
+            if presentation.showsCloseButton {
+                iconButton(systemImage: "xmark", action: { onClose?() })
+            }
+
+            if presentation.showsQuitButton {
+                iconButton(systemImage: "power", action: { onQuit?() })
+            }
+        }
+        .fixedSize(horizontal: true, vertical: false)
     }
 
     private var searchField: some View {
